@@ -2,6 +2,8 @@
 
 source "https://rubygems.org"
 
-gem "rubocop"
 gem "rake"
 gem "rspec"
+gem "rubocop"
+gem "rubocop-rake"
+gem "rubocop-rspec"
