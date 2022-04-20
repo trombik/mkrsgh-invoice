@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "shellwords"
 
 file_name = ENV["INVOICE_FILE"] || "example.yml"
@@ -11,5 +13,9 @@ end
 
 desc "Make an invoice file, invoice.pdf"
 task pdf: :html do
-  sh "chrome --headless --run-all-compositor-stages-before-draw --print-to-pdf=invoice.pdf --print-to-pdf-no-header ./invoice.html"
+  sh "chrome --headless " \
+     "--run-all-compositor-stages-before-draw " \
+     "--print-to-pdf=invoice.pdf " \
+     "--print-to-pdf-no-header " \
+     "./invoice.html"
 end
