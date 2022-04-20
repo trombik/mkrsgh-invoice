@@ -1,0 +1,23 @@
+---
+issuer:
+  name: Tomoyuki Sakurai
+  title: Business Owner
+  company_name: Makers Siem Reap
+  address: Wat Bor road 20, Siem Reap, Cambodia
+  contacts:
+    - name: Tel
+      value: +855 (0)12-0000-0000
+    - name: email
+      value: foo@example.org
+    - name: telegram
+      value: "@example"
+  currency:
+    name: USD
+    symbol: "$"
+  payment_methods:
+    - name: Bank transfer
+      text: ABA 01234568
+  term:
+    Please kindly pay the total amount by the due date. Thank you.
+  gratitude_text: |
+    All prices include VAT.
