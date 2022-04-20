@@ -1,0 +1,286 @@
+<%
+  require "date"
+  today = Time.now.to_date
+  tomorrow =  today + 1
+  issue_date = invoice.key?("issue_date") ? invoice["issue_date"] : today
+  due_date = invoice.key?("due_date") ? invoice["due_date"] : tomorrow
+  yyyy = issue_date.strftime("%Y")
+  mm = issue_date.strftime("%m")
+  dd = "01"
+  unix_time_of_month = Date.parse("#{yyyy}-#{mm}-#{dd}").strftime("%s").to_i
+  invoice_number = unix_time_of_month + invoice["number"].to_i
+%>
+<!doctype html>
+<html lang="en">
+  <head>
+	<meta charset="UTF-8">
+	<title>Invoice</title>
+    <link rel="stylesheet" href="vendor/bootstrap/dist/css/bootstrap.css" />
+	<style>
+      @import url(http://fonts.googleapis.com/css?family=Bree+Serif);
+      @page {
+        margin: 15mm 10mm;
+        size: A4;
+      }
+
+      body, h1, h2, h3, h4, h5, h6 {
+        font-family: 'Bree Serif', serif;
+
+
+      }
+      .line {
+          border-bottom: 3px solid #000;
+          width: 100%;
+      }
+
+      .line-light {
+          width: 100%;
+          border-bottom: 1px solid #949597;
+      }
+
+      .line-end {
+          width: 100%;
+          border-bottom: 3px solid #f0c29e;
+      }
+
+      .data {
+          background-color: #dcdddf;
+          padding-left: 45px;
+      }
+
+      .data .data-box {
+          margin-top: 60px;
+      }
+
+      .data .data-box .data-separator {
+          border-top: 1px solid #949597;
+          width: 10%;
+      }
+
+      .content {
+          background-color: #f1f1f1;
+          padding-right: 45px;
+      }
+
+      .without-margin {
+          margin: 0 !important;
+      }
+
+      /* To break in pages, please use this class */
+      /* https://github.com/barryvdh/laravel-snappy/issues/2 */
+      .page
+      {
+          page-break-after: always;
+          page-break-inside: avoid;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="container invoice">
+        <div class="row">
+            <!-- data -->
+            <div class="col-4 data py-4">
+                <div class="line mt-4 mb-4"></div>
+                <h1>INVOICE</h1>
+
+                <div class="data-box">
+                    <div class="data-separator d-block my-2"></div>
+                    <h4 class="text-muted font-weight-light">No. </h4>
+                    <h4 class="font-weight-bold"><%= invoice_number %></h4>
+                </div>
+                <div class="data-box">
+                    <div class="data-separator d-block my-2"></div>
+                    <h4 class="text-muted font-weight-light">INVOICE DATE</h4>
+                    <h4 class="font-weight-bold"><%= issue_date.strftime("%Y-%m-%d") %></h4>
+                </div>
+                <div class="data-box">
+                    <div class="data-separator d-block my-2"></div>
+                    <h4 class="text-muted font-weight-light">DUE DATE</h4>
+                    <h4 class="font-weight-bold"><%= due_date.strftime("%Y-%m-%d") %></h4>
+                </div>
+                <div class="data-box">
+                    <h5 class="font-weight-bold">TERMS</h5>
+                    <p><%= issuer["term"] %></p>
+                </div>
+                <div class="data-box">
+                    <h5 class="font-weight-bold">PAYMENT METHODS</h5>
+                    <% issuer["payment_methods"].each do |method| %>
+                      <h6 class="font-weight-light"><%= method["name"] %>:</h6>
+                      <p><%= method["text"] %></p>
+                    <% end %>
+                    <h6 class="font-weight-light">QR CODE</h6>
+                    <!--
+                    <img src="/images/qr.png" alt="" class="img-fluid">
+                    -->
+                </div>
+                <div class="data-box align-text-bottom">
+                  <!--
+                  <h1 class="font-weight-bold text-center"><%= issuer["company_name"] %></h1>
+                  -->
+                  <img src="images/logo-plain.svg" alt="" class="img-fluid">
+                </div>
+            </div>
+            <!-- end data -->
+
+            <!-- content -->
+            <div class="col-8 content py-4">
+                <div class="line mt-4 mb-4"></div>
+                <!-- header -->
+                <div class="header">
+                    <div class="row">
+                        <div class="col-6 from">
+                            <span class="d-block font-weight-light">FROM:</span>
+                            <h3><%= issuer["company_name"] %></h3>
+                            <!--
+                            <span class="d-block font-weight-light">123.123.12312</span>
+                            -->
+                            <span class="d-block font-weight-light">Address: <%= issuer["address"] %></span>
+                            <% issuer["contacts"].each do |contact| %>
+                              <span class="d-block font-weight-light"><%= contact["name"] %>: <%= contact["value"] %></span>
+                            <% end %>
+                        </div>
+                        <div class="col-6 to">
+                            <span class="d-block font-weight-light">TO:</span>
+                            <h3><%= invoice["name"] %></h3>
+                            <% if invoice.key?("address") %>
+                              <span class="d-block font-weight-light">Address: <%= invoice["address"] %></span>
+                            <% end %>
+                            <% if invoice.key?("contacts") %>
+                              <% invoice["contacts"].each do |contact| %>
+                                <span class="d-block font-weight-light"><%= contact["name"] %>: <%= contact["value"] %></span>
+                              <% end %>
+                            <% end %>
+                        </div>
+                    </div>
+                </div>
+                <!-- end header -->
+
+                <!-- note -->
+                <div class="row my-4">
+                    <div class="col-12">
+                      <% if invoice.key?("note") %>
+                        <p class="text-justify"><%= invoice["note"] %></p>
+                      <% end %>
+                    </div>
+                </div>
+                <!-- end note -->
+
+                <!-- items-header -->
+                <div class="items-header">
+                    <div class="row mt-4 items-header font-weight-bold">
+                        <div class="col-12 my-2">
+                            <div class="line"></div>
+                        </div>
+                        <div class="col-6">DESCRIPTION</div>
+                        <div class="col-2 text-center">PRICE</div>
+                        <div class="col-2 text-center">QUANTITY</div>
+                        <div class="col-2 text-right">TOTAL</div>
+                        <div class="col-12 my-2">
+                            <div class="line"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end items-header -->
+
+                <!-- items -->
+                <div class="items">
+                  <% invoice["items"].each do |item| %>
+                    <div class="row mt-2 list-content">
+                        <div class="col-6">
+                          <p class="without-margin"><%= item["name"] %></p>
+                          <p class="without-margin text-muted"><small><%= item["note"] %></small></p>
+                        </div>
+                        <div class="col-2 text-center"><%= issuer["currency"]["symbol"] %> <%= format("%0.2f", item["price"].to_f) %></div>
+                        <div class="col-2 text-center"><%= item["qty"] %></div>
+                        <div class="col-2 text-right"><%= issuer["currency"]["symbol"] %> <%= format("%0.2f", item["price"].to_f * item["qty"]) %></div>
+                    </div>
+                  <% end %>
+                </div>
+                <!-- end items -->
+
+                <!-- values -->
+                <div class="values">
+                    <div class="row">
+                        <div class="col-12 my-2">
+                            <div class="line"></div>
+                        </div>
+                    </div>
+                    <div class="row mt-2 list-content">
+                        <div class="col-10 font-weight-bold">
+                            SUBTOTAL
+                        </div>
+                        <%
+                          sub_total = 0
+                          discount = 0
+                          invoice["items"].each do |item|
+                            sub_total += item["price"] * item["qty"]
+                          end
+                          discount = sub_total * invoice["discount_percent"].to_i / 100.0
+                          total = sub_total - discount
+                        %>
+                      <div class="col-2 text-right font-weight-bold"><%= issuer["currency"]["symbol"] %> <%= format("%0.2f", sub_total) %></div>
+                    </div>
+                    <div class="row mt-2 list-content">
+                        <div class="col-10">
+                          Discount <%= invoice["discount_percent"] %>%
+                        </div>
+                        <div class="col-2 text-right">-(<%= issuer["currency"]["symbol"] %> <%= format("%0.2f", discount) %>)</div>
+                    </div>
+                    <div class="row mt-2 list-content">
+                        <div class="col-10">
+                          <!--
+                            Taxes 19%
+                          -->
+                        </div>
+                        <!--
+                        <div class="col-2 text-right">$ 4.104</div>
+                        -->
+                        <div class="col-12 my-2">
+                            <div class="line-end"></div>
+                        </div>
+                    </div>
+                    <div class="row mt-2 list-content">
+                        <div class="col-9">
+                            <h3 class="font-weight-bold">TOTAL</h3>
+                        </div>
+                        <div class="col-3 text-right">
+                          <h3 class="font-weight-bold"><%= issuer["currency"]["symbol"] %> <%= format("%0.2f", total) %></h3>
+                        </div>
+                    </div>
+                </div>
+                <!-- end values -->
+
+                <!-- signature -->
+                <div class="signature my-4">
+                    <div class="row">
+                        <div class="col-4 offset-8 text-right">
+                          <!--
+                            <img src="images/logo-plain.svg" alt="" class="img-fluid">
+                          -->
+                        </div>
+                        <div class="col-12 text-right">
+                          <h4 class="font-weight-bold"><%= issuer["name"] %></h4>
+                          <span class="d-block font-weight-light"><%= issuer["title"] %></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- end signature -->
+
+                <!-- gratitude -->
+                <div class="gratitude text-center my-4">
+                  <p class="text-muted"><%= issuer["gratitude_text"] %> If you have any question about this invoice, please contact <%= issuer["name"] %>.</p>
+                    <h2>Thank you</h2>
+                </div>
+                <!-- end gratitude -->
+
+                <!-- pagination -->
+                <div class="invoice-pagination text-right">
+                    <p class="text-muted text-right">Page 1 of 1</p>
+                </div>
+                <!-- end pagination -->
+            </div>
+            <!-- end content -->
+        </div>
+    </div>
+  </body>
+</html>
