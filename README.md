@@ -14,7 +14,7 @@ bundle install
 
 ## Usage
 
-The `[Rakefile](Rakefile)` generates an invoice in either HTML (the default),
+The [Rakefile](Rakefile) generates an invoice in either HTML (the default),
 or PDF.
 
 ### Creating an invoice in HTML
