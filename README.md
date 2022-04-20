@@ -1,5 +1,12 @@
 # Scripts to make invoices at `mkrsgh`
 
+A template and scripts to make invoices, based on
+[barbosa89/invoice-template](https://raw.githubusercontent.com/barbosa89/invoice-template).
+
+## Example
+
+See [example.pdf](example.pdf).
+
 ## Requirements
 
 - `ruby` 2.7
