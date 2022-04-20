@@ -12,6 +12,10 @@
 bundle install
 ```
 
+```console
+cp issuer_example.yml issuer.yml
+```
+
 ## Usage
 
 The [Rakefile](Rakefile) generates an invoice in either HTML (the default),
@@ -20,19 +24,19 @@ or PDF.
 ### Creating an invoice in HTML
 
 ```console
-bundle exec rake
+env INVOICE_FILE=invoice.yml bundle exec rake
 ```
 
 Or
 
 ```console
-bundle exec rake html
+env INVOICE_FILE=invoice.yml bundle exec rake html
 ```
 
 ### Creating an invoice in PDF
 
 ```console
-bundle exec rake pdf
+env INVOICE_FILE=invoice.yml bundle exec rake pdf
 ```
 
 Or open the HTML version in your browser, and print the page as PDF.
